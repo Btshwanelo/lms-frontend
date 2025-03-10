@@ -1,7 +1,5 @@
-// AssetsPage.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { updateAssetInfo } from '../features/loanApplication/loanApplicationSlice';
 import { 
   Card, 
   CardContent,
@@ -15,52 +13,104 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Info, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import ApplicationLayout from '@/components/ApplicationLayout';
+import { SaveApplicationModal } from '@/components/ConfirmationModal ';
+import { useNavigate } from 'react-router-dom';
+
+// Initial state for personal details
+const initialPersonalDetails = {
+  postalAddress: '123 Main Street',
+  postalCode: '12345',
+  cellNumber: '+27 81 234 5678',
+  telNumber: '+27 11 987 6543',
+  emailAddress: 'johndoe@example.com'
+};
+
+// Initial state for qualifications
+const initialQualifications = {
+  certificationNo: 'CERT-2024-001',
+  qualificationName: 'Bachelor of Business Administration',
+  qualificationStatus: 'Completed',
+  qualificationDetails: 'Full-time undergraduate degree',
+  institutionName: 'University of Technology',
+  qualificationType: 'Undergraduate',
+  qualificationYear: '2022'
+};
 
 const AssetsPage = () => {
-  const dispatch = useDispatch();
-//   const assetInfo = useSelector((state) => state.loanApplication.assetInfo);
+  // State for personal details
+  const [personalDetails, setPersonalDetails] = useState(initialPersonalDetails);
+  const navigate = useNavigate()
+  // State for qualifications
+  const [qualifications, setQualifications] = useState(initialQualifications);
 
-//   const handleInputChange = (field, value) => {
-//     dispatch(updateAssetInfo({ [field]: value }));
-//   };
+  // State to track current section
+  const [currentSection, setCurrentSection] = useState('personalDetails');
 
-  const handleNext = () => {
-    // Navigate to next page
-    console.log('Navigating to next page...');
+  // Handle input changes for personal details
+  const handlePersonalDetailsChange = (field, value) => {
+    setPersonalDetails(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const handlePrevious = () => {
-    // Navigate to previous page
-    console.log('Navigating to previous page...');
+  // Handle input changes for qualifications
+  const handleQualificationsChange = (field, value) => {
+    setQualifications(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const handleSaveAndExit = () => {
-    // Save and exit logic
-    console.log('Saving and exiting...');
-  };
+   const [isModalOpen, setIsModalOpen] = React.useState(false);
+        
+          const handleSave = () => {
+            // Handle save logic here
+            console.log('Application saved!');
+            navigate('/saved-applications')
+            setIsModalOpen(false);
+          };
 
+  // Tab navigation
   const tabItems = [
-    { id: 'personal', label: 'Personal details', active: false },
-    { id: 'qualification', label: 'Qualification', active: false },
+    { id: 'personal', label: 'Personal details', active: currentSection === 'personalDetails' },
+    { id: 'qualification', label: 'Qualification', active: currentSection === 'qualifications' },
     { id: 'financial', label: 'Financial History', active: false },
-    { id: 'assets', label: 'Assets', active: true },
+    { id: 'assets', label: 'Assets', active: false },
     { id: 'income', label: 'Income details', active: false },
     { id: 'offer', label: 'Offer', active: false },
     { id: 'selfie', label: 'Selfie Verification', active: false },
   ];
 
-  return (
-  <ApplicationLayout>
+  // Handle next and previous navigation
+  const handleNext = () => {
+    if (currentSection === 'personalDetails') {
+      setCurrentSection('qualifications');
+    }
+  };
 
-      {/* Main Content */}
+  const handlePrevious = () => {
+    if (currentSection === 'qualifications') {
+      setCurrentSection('personalDetails');
+    }
+  };
+
+  const handleSaveAndExit = () => {
+    setIsModalOpen(true);
+  };
+
+  return (
+    <ApplicationLayout>
       <div className="container mx-auto px-4 py-6">
         {/* First Card - Title and Tabs */}
         <Card className="mb-4 shadow-sm border-0 bg-white">
           <CardContent className="p-0">
             <div className="flex justify-between items-center px-6 pt-6 pb-2">
-              <h2 className="text-3xl font-semibold">Assets</h2>
+              <h2 className="text-3xl font-semibold">
+                {currentSection === 'personalDetails' ? 'Personal Details' : 'Qualifications'}
+              </h2>
               <Button 
                 variant="outline" 
                 className="border border-cyan-500 text-cyan-500 hover:bg-cyan-50"
@@ -69,20 +119,16 @@ const AssetsPage = () => {
                 Save & Exit
               </Button>
             </div>
-            <div className="flex justify-between items-center px-6 pt-6 pb-2">
-
-
-            <h2 className='font-normal text-[#475467]'>Manage your team members and their account permissions here.</h2>
-            </div>
+            
             {/* Tabs */}
-            <div className="flex overflow-x-auto mt-4 gap-2  px-6">
+            <div className="flex overflow-x-auto mt-4 gap-2 px-6">
               {tabItems.map((tab) => (
                 <div
                   key={tab.id}
                   className={`
-                    px-6 py-2 pb-3  border-t-4 flex-shrink-0 text-sm text-[#344054] font-semibold 
+                    px-6 py-2 pb-3 border-t-4 flex-shrink-0 text-sm text-[#344054] font-semibold 
                     ${tab.active 
-                      ? ' border-[#095C37] font-medium' 
+                      ? 'border-[#095C37] font-medium' 
                       : 'border-[#E4E7EC] text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }
                   `}
@@ -98,120 +144,217 @@ const AssetsPage = () => {
         <Card className="mb-4 shadow-sm border-0 bg-white">
           <CardContent className="p-0">
             <div className="bg-[#F9FAFB] py-4 px-6 mb-6">
-              <h3 className="text-lg font-semibold text-center">Personal and Business Assets</h3>
+              <h3 className="text-lg font-semibold text-center">
+                {currentSection === 'personalDetails' 
+                  ? 'Personal Details Information' 
+                  : 'Qualifications Information'}
+              </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 pb-12">
-              {/* Asset Type */}
-              <div>
-                <div className="mb-1 flex items-center">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Asset Type <span className="text-red-500">*</span>
-                  </label>
-                  <button className="ml-1 text-gray-400">
-                    <Info size={16} />
-                  </button>
+            {/* Personal Details Section */}
+            {currentSection === 'personalDetails' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 pb-12">
+                {/* Postal Address */}
+                <div>
+                  <div className="mb-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Postal Address <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Input 
+                    type="text" 
+                    className="border-gray-300"
+                    value={personalDetails.postalAddress}
+                    onChange={(e) => handlePersonalDetailsChange('postalAddress', e.target.value)}
+                  />
                 </div>
-                <Select defaultValue="Vehicle">
-                  <SelectTrigger className="w-full bg-white border-gray-300">
-                    <SelectValue placeholder="Select Asset Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Vehicle">Vehicle</SelectItem>
-                    <SelectItem value="Property">Property</SelectItem>
-                    <SelectItem value="Investment">Investment</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
-              {/* Asset Category */}
-              <div>
-                <div className="mb-1 flex items-center">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Asset Category <span className="text-red-500">*</span>
-                  </label>
-                  <button className="ml-1 text-gray-400">
-                    <Info size={16} />
-                  </button>
+                {/* Postal Code */}
+                <div>
+                  <div className="mb-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Postal Code <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Input 
+                    type="text"
+                    className="border-gray-300"
+                    value={personalDetails.postalCode}
+                    onChange={(e) => handlePersonalDetailsChange('postalCode', e.target.value)}
+                  />
                 </div>
-                <Select defaultValue="Personal">
-                  <SelectTrigger className="w-full bg-white border-gray-300">
-                    <SelectValue placeholder="Select Asset Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Personal">Personal</SelectItem>
-                    <SelectItem value="Business">Business</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
-              {/* Asset Name */}
-              <div>
-                <div className="mb-1">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Asset Name <span className="text-red-500">*</span>
-                  </label>
+                {/* Cell Number */}
+                <div>
+                  <div className="mb-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Cell Number <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Input 
+                    type="tel"
+                    className="border-gray-300"
+                    value={personalDetails.cellNumber}
+                    onChange={(e) => handlePersonalDetailsChange('cellNumber', e.target.value)}
+                  />
                 </div>
-                <Input 
-                  type="text" 
-                  className="border-gray-300"
-                  placeholder="Asset Name"
-                  defaultValue="Audi A3"
-                />
-              </div>
 
-              {/* Asset Address */}
-              <div>
-                <div className="mb-1">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Asset Address <span className="text-red-500">*</span>
-                  </label>
+                {/* Tel Number */}
+                <div>
+                  <div className="mb-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Tel Number <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Input 
+                    type="tel"
+                    className="border-gray-300"
+                    value={personalDetails.telNumber}
+                    onChange={(e) => handlePersonalDetailsChange('telNumber', e.target.value)}
+                  />
                 </div>
-                <Input 
-                  type="text"
-                  className="border-gray-300"
-                  placeholder="Asset Address"
-                  defaultValue="12 Invicta Road"
-                />
-              </div>
 
-              {/* Asset Tel No */}
-              <div>
-                <div className="mb-1">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Asset Tel No <span className="text-red-500">*</span>
-                  </label>
+                {/* Email Address */}
+                <div>
+                  <div className="mb-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Email Address <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Input 
+                    type="email"
+                    className="border-gray-300"
+                    value={personalDetails.emailAddress}
+                    onChange={(e) => handlePersonalDetailsChange('emailAddress', e.target.value)}
+                  />
                 </div>
-                <Input 
-                  type="text"
-                  className="border-gray-300"
-                  placeholder="Enter telephone number"
-                />
               </div>
+            )}
 
-              {/* Asset Location */}
-              <div>
-                <div className="mb-1 flex items-center">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Asset Location <span className="text-red-500">*</span>
-                  </label>
-                  <button className="ml-1 text-gray-400">
-                    <Info size={16} />
-                  </button>
+            {/* Qualifications Section */}
+            {currentSection === 'qualifications' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 pb-12">
+                {/* Certification Number */}
+                <div>
+                  <div className="mb-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Certification Number <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Input 
+                    type="text" 
+                    className="border-gray-300"
+                    value={qualifications.certificationNo}
+                    onChange={(e) => handleQualificationsChange('certificationNo', e.target.value)}
+                  />
                 </div>
-                <Select defaultValue="Urban">
-                  <SelectTrigger className="w-full bg-white border-gray-300">
-                    <SelectValue placeholder="Select Asset Location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Urban">Urban</SelectItem>
-                    <SelectItem value="Rural">Rural</SelectItem>
-                    <SelectItem value="Suburban">Suburban</SelectItem>
-                  </SelectContent>
-                </Select>
+
+                {/* Qualification Name */}
+                <div>
+                  <div className="mb-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Qualification Name <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Input 
+                    type="text"
+                    className="border-gray-300"
+                    value={qualifications.qualificationName}
+                    onChange={(e) => handleQualificationsChange('qualificationName', e.target.value)}
+                  />
+                </div>
+
+                {/* Qualification Status */}
+                <div>
+                  <div className="mb-1 flex items-center">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Qualification Status <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Select 
+                    value={qualifications.qualificationStatus}
+                    onValueChange={(value) => handleQualificationsChange('qualificationStatus', value)}
+                  >
+                    <SelectTrigger className="w-full bg-white border-gray-300">
+                      <SelectValue placeholder="Select Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Completed">Completed</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="Pending">Pending</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Qualification Details */}
+                <div>
+                  <div className="mb-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Qualification Details <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Input 
+                    type="text"
+                    className="border-gray-300"
+                    value={qualifications.qualificationDetails}
+                    onChange={(e) => handleQualificationsChange('qualificationDetails', e.target.value)}
+                  />
+                </div>
+
+                {/* Institution Name */}
+                <div>
+                  <div className="mb-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Institution Name <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Input 
+                    type="text"
+                    className="border-gray-300"
+                    value={qualifications.institutionName}
+                    onChange={(e) => handleQualificationsChange('institutionName', e.target.value)}
+                  />
+                </div>
+
+                {/* Qualification Type */}
+                <div>
+                  <div className="mb-1 flex items-center">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Qualification Type <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Select 
+                    value={qualifications.qualificationType}
+                    onValueChange={(value) => handleQualificationsChange('qualificationType', value)}
+                  >
+                    <SelectTrigger className="w-full bg-white border-gray-300">
+                      <SelectValue placeholder="Select Qualification Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Undergraduate">Undergraduate</SelectItem>
+                      <SelectItem value="Postgraduate">Postgraduate</SelectItem>
+                      <SelectItem value="Diploma">Diploma</SelectItem>
+                      <SelectItem value="Certificate">Certificate</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Qualification Year */}
+                <div>
+                  <div className="mb-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Qualification Year <span className="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <Input 
+                    type="text"
+                    className="border-gray-300"
+                    value={qualifications.qualificationYear}
+                    onChange={(e) => handleQualificationsChange('qualificationYear', e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
@@ -220,23 +363,30 @@ const AssetsPage = () => {
           <Button 
             variant="outline" 
             onClick={handlePrevious} 
-            className="border-gray-300 text-gray-700 flex items-center px-6"
+            className={`border-gray-300 text-gray-700 flex items-center px-6 
+              ${currentSection === 'personalDetails' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={currentSection === 'personalDetails'}
           >
             <ChevronLeft size={18} className="mr-2" /> 
             Previous
           </Button>
           <Button 
             onClick={handleNext} 
-            className="bg-sky-500 hover:bg-sky-600 text-white flex items-center px-6"
+            className={`bg-sky-500 hover:bg-sky-600 text-white flex items-center px-6 
+              ${currentSection === 'qualifications' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={currentSection === 'qualifications'}
           >
             Next 
             <ChevronRight size={18} className="ml-2" />
           </Button>
         </div>
       </div>
-
-      {/* Footer */}
-      </ApplicationLayout>
+      <SaveApplicationModal
+           isOpen={isModalOpen}
+           onClose={() => setIsModalOpen(false)}
+           onConfirm={handleSave}
+         />
+    </ApplicationLayout>
   );
 };
 
