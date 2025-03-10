@@ -15,7 +15,7 @@ const ApplicationLayout = ({children}) => {
     {/* Header */}
     <ApplicationHeader />
     {children}
-    <footer className="bg-white py-4 w-full fixed  bottom-0 left-0  right-0">
+    <footer className="bg-white py-4 w-full fixed   bottom-0 mt-2">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
           <div>
             <img 
