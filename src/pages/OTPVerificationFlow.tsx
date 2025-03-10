@@ -191,7 +191,7 @@ export const VerificationSuccess = () => {
   const navigate = useNavigate();
   
   const handleContinue = () => {
-    navigate('/dashboard'); // Navigate to dashboard or next step
+    navigate('/dash'); // Navigate to dashboard or next step
   };
   
   const handleResend = () => {
