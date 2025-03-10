@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Plus, ArrowRight, HelpCircle, PlusCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -6,9 +6,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ApplicationHeader from '@/components/ApplicationHeader';
 import ApplicationLayout from '@/components/ApplicationLayout';
+import { retry } from '@reduxjs/toolkit/query';
+import LoadingScreenExact from './LoadingScreen';
+import { useNavigate } from 'react-router-dom';
 
 const ApplicationStartScreen = () => {
   const [applicationType, setApplicationType] = useState('individual');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     idNumber: '',
     name: '',
@@ -33,7 +38,21 @@ const ApplicationStartScreen = () => {
     // Handle form submission or navigation to next step
     console.log('Form Data:', formData);
     console.log('Consents:', consents);
+    setIsLoading(true)
   };
+
+  useEffect(() => {
+    if(isLoading){
+      setTimeout(() => {
+        navigate('/application')
+      }, 2000);
+    }
+  }, [isLoading])
+  
+
+  if(isLoading){
+    return <LoadingScreenExact />
+  }
 
   return (
    <ApplicationLayout>
