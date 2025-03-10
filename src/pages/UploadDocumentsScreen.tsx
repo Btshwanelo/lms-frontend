@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { X, CheckCircle } from 'lucide-react';
+import ApplicationLayout from '@/components/ApplicationLayout';
 
 const UploadDocumentsScreen = () => {
   const dispatch = useDispatch();
@@ -45,17 +46,7 @@ const UploadDocumentsScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-600 via-cyan-500 to-white">
-      {/* Header */}
-      <header className="bg-white p-4 flex justify-between items-center">
-        <div className="text-cyan-500 font-bold flex items-center">
-          <span className="mr-1 font-semibold">RH</span>
-          <span className="font-semibold">Services</span>
-        </div>
-        <button className="text-gray-700">
-          <X size={24} />
-        </button>
-      </header>
+  <ApplicationLayout>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
@@ -81,7 +72,7 @@ const UploadDocumentsScreen = () => {
         </div>
 
         {/* Upload Information Card */}
-        <div className="bg-sky-50 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
+        <div className="bg-sky-50 rounded-lg p-6 mb-8 max-w-4xl mx-auto">
           <h1 className="text-2xl font-bold mb-4">Upload documents</h1>
           <p className="text-gray-700">
             Kindly Upload the following documents:<br />
@@ -91,10 +82,10 @@ const UploadDocumentsScreen = () => {
         </div>
 
         {/* Documents Section */}
-        <div className="max-w-2xl mx-auto mb-8">
+        <div className="max-w-4xl mx-auto mb-8">
           <h2 className="text-xl font-semibold text-center mb-6">Documents</h2>
           
-          <div className="space-y-6">
+          <div className="space-y-6 max-w-xl">
             {/* Latest Payslip */}
             <div>
               <label className="block text-gray-700 mb-2">
@@ -138,11 +129,8 @@ const UploadDocumentsScreen = () => {
                 </Button>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between max-w-2xl mx-auto">
+            <div className="max-w-2xl flex gap-4 items-start justify-self-start">
           <Button 
             variant="outline"
             onClick={handlePreviousClick}
@@ -154,23 +142,16 @@ const UploadDocumentsScreen = () => {
           <Button 
             onClick={handleNextClick}
             className="bg-sky-500 hover:bg-sky-600 text-white"
-          >
+            >
             Next
           </Button>
+            </div>
+          </div>
         </div>
+
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white p-4 mt-auto flex justify-between items-center">
-        <div className="text-cyan-500 font-bold flex items-center">
-          <span className="mr-1 font-semibold">RH</span>
-          <span className="font-semibold">Services</span>
-        </div>
-        <div className="text-gray-500 text-sm">
-          © 2024 Ezra 360 LMS. All rights reserved.
-        </div>
-      </footer>
-    </div>
+      </ApplicationLayout>
   );
 };
 

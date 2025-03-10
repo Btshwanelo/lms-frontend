@@ -11,6 +11,7 @@ import CongratulationsScreen from './pages/CongratulationsScreen';
 import EligibilityErrorPage from './pages/EligibilityErrorPage ';
 import UploadDocumentsScreen from './pages/UploadDocumentsScreen';
 import DashboardPage from './pages/DashboardPage';
+import SavedApplicationsPage from './pages/SavedApplicationsPage ';
 
 // Layout Components
 // import MainLayout from './layouts/MainLayout';
@@ -54,6 +55,7 @@ function App() {
               <Route path="/error" element={<EligibilityErrorPage />} />
               <Route path="/upload" element={<UploadDocumentsScreen />} />
               <Route path="/dash" element={<DashboardPage />} />
+              <Route path="/saved-applications" element={<SavedApplicationsPage />} />
 
               <Route path="/verify" element={<OTPNotification />} />
   <Route path="/verify/enter-otp" element={<OTPInput />} />

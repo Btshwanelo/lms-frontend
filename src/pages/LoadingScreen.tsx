@@ -1,25 +1,10 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import ApplicationLayout from '@/components/ApplicationLayout';
 
 const LoadingScreen = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-r from-cyan-900 via-white to-cyan-900">
-      {/* Header */}
-      <header className="flex justify-between items-center p-4 bg-white">
-        <div className="flex items-center">
-          <img 
-            src="/logo.svg" 
-            alt="RHS Services Logo" 
-            className="h-6"
-            onError={(e) => {
-              e.target.outerHTML = '<div class="text-lg font-semibold text-blue-500">RHS<span class="text-blue-300">Services</span></div>';
-            }}
-          />
-        </div>
-        <button className="p-1">
-          <X className="h-6 w-6 text-gray-700" />
-        </button>
-      </header>
+    <ApplicationLayout>
 
       {/* Main Content */}
       <main className="flex-grow flex flex-col items-center justify-center">
@@ -38,24 +23,7 @@ const LoadingScreen = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white p-4 border-t">
-        <div className="max-w-5xl mx-auto flex justify-between items-center">
-          <div>
-            <img 
-              src="/logo.svg" 
-              alt="RHS Services Logo" 
-              className="h-6"
-              onError={(e) => {
-                e.target.outerHTML = '<div class="text-lg font-semibold text-blue-500">RHS<span class="text-blue-300">Services</span></div>';
-              }}
-            />
-          </div>
-          <div className="text-sm text-gray-500">
-            © 2024 Ezra 360 LMS. All rights reserved.
-          </div>
-        </div>
-      </footer>
-    </div>
+      </ApplicationLayout>
   );
 };
 
@@ -150,32 +118,10 @@ const LoadingScreenWithCustomSpinner = () => {
 // Custom version with the provided SVG spinner
 const LoadingScreenExact = () => {
   return (
-    <div className="flex flex-col min-h-screen relative overflow-hidden">
-      {/* Background with gradient blobs */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-[200px] -left-[200px] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-cyan-600 to-blue-500 opacity-20 blur-3xl"></div>
-        <div className="absolute -bottom-[200px] -right-[200px] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-cyan-600 to-blue-500 opacity-20 blur-3xl"></div>
-      </div>
-      
-      {/* Header */}
-      <header className="relative z-10 flex justify-between items-center p-4 bg-white">
-        <div className="flex items-center">
-          <img 
-            src="/logo.svg" 
-            alt="RHS Services Logo" 
-            className="h-6"
-            onError={(e) => {
-              e.target.outerHTML = '<div class="text-lg font-semibold text-blue-500">RHS<span class="text-blue-300">Services</span></div>';
-            }}
-          />
-        </div>
-        <button className="p-1">
-          <X className="h-6 w-6 text-gray-700" />
-        </button>
-      </header>
+    <ApplicationLayout>
 
       {/* Main Content */}
-      <main className="relative z-10 flex-grow flex flex-col items-center justify-center">
+      <main className="relative z-10 flex-grow min-h-[80vh] flex flex-col items-center content-center justify-center">
         <div className="text-center">
           <h1 className="text-3xl font-semibold text-gray-800 mb-3">Hang Tight!</h1>
           <p className="text-gray-600">Please bear with us while we get everything ready.</p>
@@ -207,24 +153,7 @@ const LoadingScreenExact = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 bg-white p-4 border-t">
-        <div className="max-w-5xl mx-auto flex justify-between items-center">
-          <div>
-            <img 
-              src="/logo.svg" 
-              alt="RHS Services Logo" 
-              className="h-6"
-              onError={(e) => {
-                e.target.outerHTML = '<div class="text-lg font-semibold text-blue-500">RHS<span class="text-blue-300">Services</span></div>';
-              }}
-            />
-          </div>
-          <div className="text-sm text-gray-500">
-            © 2024 Ezra 360 LMS. All rights reserved.
-          </div>
-        </div>
-      </footer>
+   
 
       {/* CSS Animation for Spinner */}
       <style jsx>{`
@@ -239,7 +168,7 @@ const LoadingScreenExact = () => {
           100% { transform: rotate(0deg); }
         }
       `}</style>
-    </div>
+    </ApplicationLayout>
   );
 };
 

@@ -5,8 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, Flashlight, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
+  const navigate = useNavigate()
   return (
     <div className="flex flex-col min-h-screen w-full ">
       {/* Navigation Bar */}
@@ -58,7 +60,7 @@ const LandingPage = () => {
             <p className="text-lg text-[#475467]  font-normal mb-8">
               Leading Financial Solutions Tailored for<br/> Healthcare Professionals.
             </p>
-            <Button className="bg-blue-500 w-full hover:bg-blue-600 text-white px-8 py-6 text-base rounded-md">
+            <Button className="bg-blue-500 w-full hover:bg-blue-600 text-white px-8 py-6 text-base rounded-md" onClick={()=>navigate('create-profile')}>
               Get Started
             </Button>
           </div>

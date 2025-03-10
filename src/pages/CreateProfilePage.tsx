@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { CheckCircle } from 'lucide-react';
@@ -8,6 +8,8 @@ const CreateProfilePage = () => {
   const [activeTab, setActiveTab] = useState('signup');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const navigate = useNavigate()
   
   // Password validation checks
   const hasMinLength = password.length >= 8;
@@ -41,7 +43,7 @@ const CreateProfilePage = () => {
         {/* Tabs */}
         <div className="flex mb-8">
           <button
-            className={`flex-1 py-3 text-center border ${
+            className={`flex-1 py-2 text-center border ${
               activeTab === 'signup' 
                 ? 'border-gray-300 bg-white text-gray-900 font-medium' 
                 : 'border-gray-200 bg-gray-50 text-gray-500'
@@ -51,7 +53,7 @@ const CreateProfilePage = () => {
             Sign up
           </button>
           <button
-            className={`flex-1 py-3 text-center border ${
+            className={`flex-1 py-2 text-center border ${
               activeTab === 'login' 
                 ? 'border-gray-300 bg-white text-gray-900 font-medium' 
                 : 'border-gray-200 bg-gray-50 text-gray-500'
@@ -183,6 +185,7 @@ const CreateProfilePage = () => {
             
             <Button 
               type="submit" 
+              onClick={()=>navigate('/verify')}
               className="w-full py-6 bg-blue-500 hover:bg-blue-600 text-white"
             >
               Log in

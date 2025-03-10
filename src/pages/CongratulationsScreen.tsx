@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import ApplicationLayout from '@/components/ApplicationLayout';
 
 const CongratulationsScreen = () => {
   const dispatch = useDispatch();
@@ -22,17 +23,7 @@ const CongratulationsScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-600 via-cyan-500 to-white">
-      {/* Header */}
-      <header className="bg-white p-4 flex justify-between items-center">
-        <div className="text-cyan-500 font-bold flex items-center">
-          <span className="mr-1 font-semibold">RH</span>
-          <span className="font-semibold">Services</span>
-        </div>
-        <button className="text-gray-700">
-          <X size={24} />
-        </button>
-      </header>
+  <ApplicationLayout>
 
       {/* Main Content */}
       <div className="container mx-auto p-8">
@@ -236,16 +227,7 @@ const CongratulationsScreen = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white p-4 mt-12 flex justify-between items-center">
-        <div className="text-cyan-500 font-bold flex items-center">
-          <span className="mr-1 font-semibold">RH</span>
-          <span className="font-semibold">Services</span>
-        </div>
-        <div className="text-gray-500 text-sm">
-          © 2024 Ezra 360 LMS. All rights reserved.
-        </div>
-      </footer>
-    </div>
+      </ApplicationLayout>
   );
 };
 

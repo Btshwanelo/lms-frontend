@@ -16,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Info, X } from 'lucide-react';
+import ApplicationLayout from '@/components/ApplicationLayout';
 
 const AssetsPage = () => {
   const dispatch = useDispatch();
@@ -51,17 +52,7 @@ const AssetsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-600 via-cyan-500 to-white">
-      {/* Header */}
-      <header className="bg-white p-4 flex justify-between items-center">
-        <div className="text-cyan-500 font-bold flex items-center">
-          <span className="mr-1 font-semibold">RH</span>
-          <span className="font-semibold">Services</span>
-        </div>
-        <button className="text-gray-700">
-          <X size={24} />
-        </button>
-      </header>
+  <ApplicationLayout>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6">
@@ -225,7 +216,7 @@ const AssetsPage = () => {
         </Card>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between mb-8 bg-white">
+        <div className="flex justify-between rounded-lg bg-white px-16 py-6">
           <Button 
             variant="outline" 
             onClick={handlePrevious} 
@@ -245,16 +236,7 @@ const AssetsPage = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white p-4 flex justify-between items-center">
-        <div className="text-cyan-500 font-bold flex items-center">
-          <span className="mr-1 font-semibold">RH</span>
-          <span className="font-semibold">Services</span>
-        </div>
-        <div className="text-gray-500 text-sm">
-          © 2024 Ezra 360 LMS. All rights reserved.
-        </div>
-      </footer>
-    </div>
+      </ApplicationLayout>
   );
 };
 

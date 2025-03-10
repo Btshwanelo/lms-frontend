@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { X, Plus, ArrowRight, HelpCircle } from 'lucide-react';
+import { X, Plus, ArrowRight, HelpCircle, PlusCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import ApplicationHeader from '@/components/ApplicationHeader';
+import ApplicationLayout from '@/components/ApplicationLayout';
 
 const ApplicationStartScreen = () => {
   const [applicationType, setApplicationType] = useState('individual');
@@ -34,56 +36,40 @@ const ApplicationStartScreen = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-r from-cyan-900 to-blue-100">
-      {/* Header */}
-      <header className="flex justify-between items-center p-4 bg-white mb-2">
-        <div className="flex items-center">
-          <img 
-            src="/logo.svg" 
-            alt="RHS Services Logo" 
-            className="h-6"
-            onError={(e) => {
-              e.target.outerHTML = '<div class="text-lg font-semibold text-blue-500">RHS<span class="text-blue-300">Services</span></div>';
-            }}
-          />
-        </div>
-        <button className="p-1">
-          <X className="h-6 w-6 text-gray-700" />
-        </button>
-      </header>
+   <ApplicationLayout>
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col">
+      <main className="flex-grow flex flex-col pt-4 pb-24 px-4 md:px-8">
         {/* Application Container */}
         <div className="mx-auto w-full max-w-5xl flex flex-col flex-grow">
           {/* Top Section */}
-          <div className="bg-white rounded-lg p-6 mb-4 shadow-sm">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-800">Get started with your application</h1>
-              <Button variant="outline" className="text-[#58B6E9] border-[#58B6E9] hover:bg-blue-50">
+          <div className="bg-white rounded-lg p-4 md:p-6 mb-4 shadow-sm">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 md:mb-8">
+              <h1 className="text-xl md:text-2xl font-bold text-gray-800">Get started with your application</h1>
+              <Button variant="outline" className="text-[#58B6E9] border-[#58B6E9] hover:bg-blue-50 w-full md:w-auto">
                 Save & Exit
               </Button>
             </div>
             
             {/* Collapsible Information Panel */}
-            <div className="border border-gray-200 rounded-lg p-4 flex justify-between items-center">
-              <h2 className="text-gray-700 font-medium">Important Information About Our Integrated Verification Process</h2>
-              <button className="text-gray-400">
-                <Plus className="h-5 w-5" />
+            <div className=" bg-gray-100 rounded-lg p-4 flex justify-between items-center">
+              <h2 className="text-sm md:text-base text-gray-700">Important Information About Our Integrated Verification Process</h2>
+              <button className="text-gray-400 flex-shrink-0">
+                <PlusCircle className="h-5 w-5" />
               </button>
             </div>
           </div>
 
           {/* Form Section */}
-          <div className="bg-white rounded-lg p-6 mb-4 shadow-sm flex-grow">
+          <div className="bg-white rounded-lg p-4 md:p-6 mb-4 shadow-sm  ">
             {/* Application Type Toggle */}
-            <div className="flex mb-6">
+            <div className="flex mb-6 max-w-2xl">
               <button
                 className={`flex-1 py-2 px-4 text-center border ${
                   applicationType === 'individual' 
                     ? 'bg-white border-gray-300 text-gray-800 font-medium' 
                     : 'bg-gray-50 border-gray-200 text-gray-500'
-                } rounded-l-md`}
+                } rounded-l-md transition-colors`}
                 onClick={() => setApplicationType('individual')}
               >
                 Individual
@@ -93,7 +79,7 @@ const ApplicationStartScreen = () => {
                   applicationType === 'business' 
                     ? 'bg-white border-gray-300 text-gray-800 font-medium' 
                     : 'bg-gray-50 border-gray-200 text-gray-500'
-                } rounded-r-md`}
+                } rounded-r-md transition-colors`}
                 onClick={() => setApplicationType('business')}
               >
                 Business / Entity
@@ -101,7 +87,7 @@ const ApplicationStartScreen = () => {
             </div>
 
             {/* Form Fields */}
-            <div className="space-y-6">
+            <div className="space-y-6 max-w-2xl">
               {/* ID Number Field */}
               <div>
                 <div className="flex items-center mb-1">
@@ -115,7 +101,7 @@ const ApplicationStartScreen = () => {
                 </div>
                 <Select>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={formData.idNumber || ""} />
+                    <SelectValue placeholder={formData.idNumber || "Select ID Number"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="9902020304089">9902020304089</SelectItem>
@@ -138,6 +124,7 @@ const ApplicationStartScreen = () => {
                   value={formData.name}
                   onChange={handleChange}
                   className="w-full border-gray-300"
+                  placeholder="Enter your name"
                 />
               </div>
               
@@ -155,6 +142,7 @@ const ApplicationStartScreen = () => {
                   value={formData.surname}
                   onChange={handleChange}
                   className="w-full border-gray-300"
+                  placeholder="Enter your surname"
                 />
               </div>
 
@@ -200,15 +188,15 @@ const ApplicationStartScreen = () => {
           </div>
 
           {/* Bottom Navigation */}
-          <div className="bg-white rounded-lg p-6 mb-2 shadow-sm">
+          <div className="bg-white rounded-lg p-4 md:p-6 mb-2 shadow-sm">
             <div className="flex justify-start">
               <Button 
                 onClick={handleNext}
-                className={`flex items-center text-white px-6 py-5 ${
+                className={`flex items-center text-white w-40 px-4 md:px-6 py-3 md:py-5 ${
                   formData.name && formData.surname && consents.academic && consents.credit && consents.notBlacklisted
                     ? 'bg-[#58B6E9] hover:bg-blue-400' 
                     : 'bg-gray-200 text-gray-500'
-                }`}
+                } transition-colors`}
                 disabled={!(formData.name && formData.surname && consents.academic && consents.credit && consents.notBlacklisted)}
               >
                 Next
@@ -219,25 +207,8 @@ const ApplicationStartScreen = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white p-4">
-        <div className="max-w-5xl mx-auto flex justify-between items-center">
-          <div>
-            <img 
-              src="/logo.svg" 
-              alt="RHS Services Logo" 
-              className="h-6"
-              onError={(e) => {
-                e.target.outerHTML = '<div class="text-lg font-semibold text-blue-500">RHS<span class="text-blue-300">Services</span></div>';
-              }}
-            />
-          </div>
-          <div className="text-sm text-gray-500">
-            © 2024 Ezra 360 LMS. All rights reserved.
-          </div>
-        </div>
-      </footer>
-    </div>
+      {/* Footer - Now positioned at the bottom of the page */}
+      </ApplicationLayout>
   );
 };
 
@@ -271,7 +242,12 @@ const ApplicationStartScreenFilled = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-r from-cyan-900 to-blue-100">
+    <div className="min-h-screen w-full relative">
+      {/* Background Image - Now positioned to cover the entire page */}
+      <div className="fixed inset-0 w-full h-full z-[-1]">
+        <div className="w-full h-full bg-gradient-to-r from-cyan-900 to-blue-100"></div>
+      </div>
+      
       {/* Header */}
       <header className="flex justify-between items-center p-4 bg-white">
         <div className="flex items-center">
@@ -290,29 +266,29 @@ const ApplicationStartScreenFilled = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col">
+      <main className="flex-grow flex flex-col pt-4 pb-24 px-4 md:px-8">
         {/* Application Container */}
         <div className="mx-auto w-full max-w-5xl flex flex-col flex-grow">
           {/* Top Section */}
-          <div className="bg-white rounded-lg p-6 mb-4 shadow-sm">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-800">Get started with your application</h1>
-              <Button variant="outline" className="text-blue-500 border-blue-500 hover:bg-blue-50">
+          <div className="bg-white rounded-lg p-4 md:p-6 mb-4 shadow-sm">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 md:mb-8">
+              <h1 className="text-xl md:text-2xl font-bold text-gray-800">Get started with your application</h1>
+              <Button variant="outline" className="text-blue-500 border-blue-500 hover:bg-blue-50 w-full md:w-auto">
                 Save & Exit
               </Button>
             </div>
             
             {/* Collapsible Information Panel */}
             <div className="border border-gray-200 rounded-lg p-4 flex justify-between items-center">
-              <h2 className="text-gray-700 font-medium">Important Information About Our Integrated Verification Process</h2>
-              <button className="text-gray-400">
+              <h2 className="text-sm md:text-base text-gray-700 font-medium">Important Information About Our Integrated Verification Process</h2>
+              <button className="text-gray-400 flex-shrink-0">
                 <Plus className="h-5 w-5" />
               </button>
             </div>
           </div>
 
           {/* Form Section */}
-          <div className="bg-white rounded-lg p-6 mb-4 shadow-sm flex-grow">
+          <div className="bg-white rounded-lg p-4 md:p-6 mb-4 shadow-sm flex-grow">
             {/* Application Type Toggle */}
             <div className="flex mb-6">
               <button
@@ -320,7 +296,7 @@ const ApplicationStartScreenFilled = () => {
                   applicationType === 'individual' 
                     ? 'bg-white border-gray-300 text-gray-800 font-medium' 
                     : 'bg-gray-50 border-gray-200 text-gray-500'
-                } rounded-l-md`}
+                } rounded-l-md transition-colors`}
                 onClick={() => setApplicationType('individual')}
               >
                 Individual
@@ -330,7 +306,7 @@ const ApplicationStartScreenFilled = () => {
                   applicationType === 'business' 
                     ? 'bg-white border-gray-300 text-gray-800 font-medium' 
                     : 'bg-gray-50 border-gray-200 text-gray-500'
-                } rounded-r-md`}
+                } rounded-r-md transition-colors`}
                 onClick={() => setApplicationType('business')}
               >
                 Business / Entity
@@ -437,11 +413,11 @@ const ApplicationStartScreenFilled = () => {
           </div>
 
           {/* Bottom Navigation */}
-          <div className="bg-white rounded-lg p-6 shadow-sm">
+          <div className="bg-white rounded-lg p-4 md:p-6 shadow-sm">
             <div className="flex justify-end">
               <Button 
                 onClick={handleNext}
-                className="flex items-center px-6 py-5 bg-blue-500 hover:bg-blue-600"
+                className="flex items-center px-4 md:px-6 py-3 md:py-5 bg-blue-500 hover:bg-blue-600"
               >
                 Next
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -451,9 +427,9 @@ const ApplicationStartScreenFilled = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white p-4 border-t">
-        <div className="max-w-5xl mx-auto flex justify-between items-center">
+      {/* Footer - Now positioned at the bottom of the page */}
+      <footer className="bg-white p-4 border-t w-full absolute bottom-0 left-0 right-0">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
           <div>
             <img 
               src="/logo.svg" 
