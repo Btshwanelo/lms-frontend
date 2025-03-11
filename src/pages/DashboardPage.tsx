@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/tabs";
 import Header from '@/components/Header';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const DashboardPage = () => {
   const [showFundingNotice, setShowFundingNotice] = useState(true);
@@ -21,7 +22,7 @@ const navigate = useNavigate()
       <main className="container mx-auto py-8 px-18 bg-white  rounded-lg">
         {/* Funding Notice */}
         {showFundingNotice && (
-          <div className="bg-white p-4 rounded-md border-b border-gray-100 mb-6 flex items-center justify-between">
+          <div className="bg-white p-4  border-b border-gray-200 mb-6 flex items-center justify-between">
             <div className="flex items-start md:items-center">
               <div className="p-2 bg-gray-100 rounded-full mr-4">
                 <Info size={20} className="text-gray-500" />
@@ -96,15 +97,15 @@ const navigate = useNavigate()
             <div>
               <h2 className="text-lg font-semibold mb-4">Features</h2>
               <div className="space-y-2">
-                <div className="bg-white p-4 rounded-md border border-gray-200 flex justify-between items-center">
-                  <span className="text-gray-700">Log a case</span>
+              <div onClick={()=>navigate('/case')} className="bg-white p-4 cursor-pointer rounded-md border border-gray-200 flex justify-between items-center">
+              <span className="text-gray-700">Log a case</span>
                   <ChevronRight size={18} className="text-gray-400" />
                 </div>
-                <div className="bg-white p-4 rounded-md border border-gray-200 flex justify-between items-center">
+                <div onClick={()=>navigate('/account')} className="bg-white p-4 cursor-pointer rounded-md border border-gray-200 flex justify-between items-center">
                   <span className="text-gray-700">Account Details</span>
                   <ChevronRight size={18} className="text-gray-400" />
                 </div>
-                <div className="bg-white p-4 rounded-md border border-gray-200 flex justify-between items-center">
+                <div onClick={()=>navigate('/statements')} className="bg-white p-4 cursor-pointer rounded-md border border-gray-200 flex justify-between items-center">
                   <span className="text-gray-700">Statement and Documents</span>
                   <ChevronRight size={18} className="text-gray-400" />
                 </div>
@@ -116,33 +117,33 @@ const navigate = useNavigate()
           <div className="w-full md:w-2/3">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Transactions</h2>
-              <a href="#" className="text-blue-500 flex items-center">
+              <Button onClick={()=> navigate('/statements')} variant={'ghost'} className="text-blue-500 cursor-pointer flex items-center">
                 Statements <ChevronRight size={16} />
-              </a>
+              </Button>
             </div>
             
             <Tabs defaultValue="all">
-              <TabsList className="mb-4 border-b border-gray-200  justify-start">
+              <TabsList className="mb-4   justify-start">
                 <TabsTrigger value="all" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none min-w-28 pb-2">All transactions</TabsTrigger>
                 <TabsTrigger value="failed" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none min-w-28 pb-2">failed</TabsTrigger>
                 <TabsTrigger value="once-off" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none min-w-28 pb-2">Once-off</TabsTrigger>
               </TabsList>
               
-              <div className="bg-white rounded-md border border-gray-200">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200">
+              <div className="bg-white rounded-lg border border-gray-200">
+                <table className="w-full text-sm rounded-lg">
+                  <thead className='bg-[#F9FAFB] '>
+                    <tr className="border-b border-gray-200 ">
                       <th className="w-12 p-4 text-left">
                         <input type="checkbox" className="rounded" />
                       </th>
-                      <th className="p-4 text-left font-medium text-gray-600">Date</th>
-                      <th className="p-4 text-left font-medium text-gray-600">
+                      <th className="p-4 text-left font-medium text-[#475467]">Date</th>
+                      <th className="p-4 text-left font-medium text-[#475467]">
                         Description <span>↓</span>
                       </th>
-                      <th className="p-4 text-right font-medium text-gray-600">
+                      <th className="p-4 text-right font-medium text-[#475467]">
                         Amount <Info size={14} className="inline ml-1" />
                       </th>
-                      <th className="p-4 text-right font-medium text-gray-600">Balance</th>
+                      <th className="p-4 text-right font-medium text-[#475467]">Balance</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -50,7 +50,7 @@ const CongratulationsScreen = () => {
                   </div>
                   <Input 
                     type="text" 
-                    className="rounded-l-none"
+                    className='bg-white border-l border-gray-100 rounded-l-none'
                     defaultValue="1050000" 
                   />
                 </div>
@@ -64,6 +64,7 @@ const CongratulationsScreen = () => {
                 <Input 
                   type="text" 
                   defaultValue="5%" 
+                  className='bg-white border-l border-gray-100'
                 />
               </div>
 
@@ -78,7 +79,7 @@ const CongratulationsScreen = () => {
                   </div>
                   <Input 
                     type="text" 
-                    className="rounded-l-none"
+                     className='bg-white border-l border-gray-100 rounded-l-none'
                     defaultValue="0" 
                   />
                 </div>
@@ -90,10 +91,10 @@ const CongratulationsScreen = () => {
                   Payment term (years) <span className="text-blue-500">*</span>
                 </label>
                 <Select defaultValue="5">
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full bg-white border-gray-100">
                     <SelectValue placeholder="Select term" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className='bg-white'>
                     <SelectItem value="1">1</SelectItem>
                     <SelectItem value="2">2</SelectItem>
                     <SelectItem value="3">3</SelectItem>

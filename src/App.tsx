@@ -12,6 +12,14 @@ import EligibilityErrorPage from './pages/EligibilityErrorPage ';
 import UploadDocumentsScreen from './pages/UploadDocumentsScreen';
 import DashboardPage from './pages/DashboardPage';
 import SavedApplicationsPage from './pages/SavedApplicationsPage ';
+import LoanApplicationConfirmation from './pages/LoanApplication';
+import SelfieVerificationIntro from './pages/VerificationIntro';
+import SelfieVerificationPage from './pages/PicturePage';
+import Dashboard from './pages/v2/Dashboard';
+import SignupForm from './pages/v2/SignupForm';
+import ApplicationForm from './pages/v2/ApplicationForm';
+import StatementsPage from './pages/Statements/StatementsPage';
+import LogCasePage from './pages/Case/LogCasePage';
 
 // Layout Components
 // import MainLayout from './layouts/MainLayout';
@@ -55,11 +63,23 @@ function App() {
               <Route path="/error" element={<EligibilityErrorPage />} />
               <Route path="/upload" element={<UploadDocumentsScreen />} />
               <Route path="/dash" element={<DashboardPage />} />
+              <Route path="/confirm" element={<LoanApplicationConfirmation />} />
               <Route path="/saved-applications" element={<SavedApplicationsPage />} />
 
+
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/sign-up" element={<SignupForm />} />
+              <Route path="/otp-input" element={<OTPInput />} />
+              <Route path="/app-form" element={<ApplicationForm />} />
+
               <Route path="/verify" element={<OTPNotification />} />
-  <Route path="/verify/enter-otp" element={<OTPInput />} />
-  <Route path="/verify/success" element={<VerificationSuccess />} />
+              <Route path="/user-verify" element={<SelfieVerificationIntro />} />
+              <Route path="/user-verify-picture" element={<SelfieVerificationPage />} />
+              <Route path="/verify/enter-otp" element={<OTPInput />} />
+              <Route path="/verify/success" element={<VerificationSuccess />} />
+              <Route path="/statements" element={<StatementsPage />} />
+              <Route path="/case" element={<LogCasePage />} />
+              <Route path="/account" element={<LogCasePage />} />
 
               <Route path="about" element={<div>About Us Page</div>} />
               <Route path="contact" element={<div>Contact Page</div>} />

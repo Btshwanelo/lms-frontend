@@ -147,8 +147,8 @@ const CreateProfilePage = () => {
             
             <Button 
               type="submit" 
-              className="w-full py-6 bg-gray-100 hover:bg-gray-200 text-gray-700"
-              disabled={!hasMinLength || !hasSpecialChar || !passwordsMatch}
+              className="w-full py-6 bg-[#0086C9] hover:bg-[#0086C9] font-semibold text-white"
+              // disabled={!hasMinLength || !hasSpecialChar || !passwordsMatch}
             >
               Get started
             </Button>
@@ -186,7 +186,7 @@ const CreateProfilePage = () => {
             <Button 
               type="submit" 
               onClick={()=>navigate('/verify')}
-              className="w-full py-6 bg-blue-500 hover:bg-blue-600 text-white"
+              className="w-full py-6 bg-[#0086C9] hover:bg-[#0086C9] font-semibold text-white"
             >
               Log in
             </Button>
@@ -198,7 +198,7 @@ const CreateProfilePage = () => {
           <p className="text-sm text-gray-600">
             {activeTab === 'signup' ? 'Already have an account? ' : 'Don\'t have an account? '}
             <button 
-              className="text-blue-500 hover:text-blue-700 font-medium"
+              className="text-[#0086C9] hover:text-[#0086C9] font-medium"
               onClick={() => setActiveTab(activeTab === 'signup' ? 'login' : 'signup')}
             >
               {activeTab === 'signup' ? 'Log in' : 'Sign up'}

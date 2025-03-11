@@ -96,11 +96,12 @@ const UploadDocumentsScreen = () => {
                   type="text"
                   readOnly
                   value={files.payslip.name}
-                  className="rounded-r-none"
+                  className="rounded-r-none border border-gray-300 bg-white"
                 />
                 <Button 
                   variant="outline"
-                  className="rounded-l-none border-l-0 px-3"
+                  className="rounded-l-none border-l-0 px-3 border border-gray-300"
+
                   onClick={() => handleClearFile('payslip')}
                 >
                   <X size={18} /> Clear
@@ -118,11 +119,11 @@ const UploadDocumentsScreen = () => {
                   type="text"
                   readOnly
                   value={files.idDocument.name}
-                  className="rounded-r-none"
+                  className="rounded-r-none border border-gray-300 bg-white"
                 />
                 <Button 
                   variant="outline"
-                  className="rounded-l-none border-l-0 px-3"
+                  className="rounded-l-none border-l-0 px-3 border border-gray-300"
                   onClick={() => handleClearFile('idDocument')}
                 >
                   <X size={18} /> Clear

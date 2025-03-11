@@ -31,7 +31,7 @@ export const OTPNotification = () => {
         
         {/* Action Button */}
         <Button 
-          className="w-full bg-[#0288D1] hover:bg-[#0277BD] text-white py-6"
+          className="w-full bg-[#0288D1] hover:bg-[#0277BD] font-semibold text-white py-6"
           onClick={handleEnterManually}
         >
           Enter code manually
@@ -153,7 +153,7 @@ export const OTPInput = () => {
         <Button 
           className={`w-full py-6 ${
             isOtpComplete 
-              ? 'bg-[#0288D1] hover:bg-[#0277BD] text-white' 
+              ? 'bg-[#0288D1] hover:bg-[#0277BD] font-semibold text-white' 
               : 'bg-[#E0E0E0] text-gray-500 cursor-not-allowed'
           }`}
           onClick={handleVerify}
@@ -166,7 +166,7 @@ export const OTPInput = () => {
         <p className="mt-4 text-sm text-gray-600">
           Didn't receive the email? 
           <button 
-            className="ml-1 text-[#0288D1] hover:underline"
+            className="ml-1 text-[#0288D1] font-semibold hover:underline"
             onClick={handleResend}
           >
             Click to resend
@@ -219,7 +219,7 @@ export const VerificationSuccess = () => {
         
         {/* Continue Button */}
         <Button 
-          className="w-full bg-[#0288D1] hover:bg-[#0277BD] text-white py-6"
+          className="w-full bg-[#0288D1] hover:bg-[#0277BD] font-semibold text-white py-6"
           onClick={handleContinue}
         >
           Continue
@@ -229,7 +229,7 @@ export const VerificationSuccess = () => {
         <p className="mt-4 text-sm text-gray-600">
           Didn't receive the email? 
           <button 
-            className="ml-1 text-[#0288D1] hover:underline"
+            className="ml-1 text-[#0288D1] font-semibold hover:underline"
             onClick={handleResend}
           >
             Click to resend
