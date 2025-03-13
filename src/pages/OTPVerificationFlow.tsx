@@ -1,18 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  useConfirmOTPReqMutation,
+  useResendOTPReqMutation, 
+} from '@/service/genericServices';
+import useAuth from '@/hooks/useAuth';
 
 // 1. OTP Notification Screen
 export const OTPNotification = () => {
   const navigate = useNavigate();
+  const auth = useAuth();
+  const [error, setError] = useState('');
+  
+  // Check if we have the necessary auth info
+  // useEffect(() => {
+  //   if (!auth.mobile && !auth.email) {
+  //     setError('Authentication information missing. Please log in again.');
+  //   }
+  // }, [auth]);
   
   const handleEnterManually = () => {
     navigate('/verify/enter-otp');
   };
   
   const handleBackToLogin = () => {
-    navigate('/login');
+    navigate('/auth');
   };
   
   return (
@@ -26,13 +40,22 @@ export const OTPNotification = () => {
         {/* Title and Description */}
         <h1 className="text-2xl font-semibold text-center mb-2">Check your phone</h1>
         <p className="text-gray-600 text-center mb-8">
-          Keep your phone close. We sent you an otp to your phone for verification.
+          Keep your phone close. We sent you an OTP to {auth.mobile || 'your phone'} for verification.
         </p>
+        
+        {/* Error Message */}
+        {error && (
+          <div className="w-full p-3 mb-4 flex items-center bg-red-50 text-red-700 rounded">
+            <AlertCircle className="h-5 w-5 mr-2" />
+            <span>{error}</span>
+          </div>
+        )}
         
         {/* Action Button */}
         <Button 
           className="w-full bg-[#0288D1] hover:bg-[#0277BD] font-semibold text-white py-6"
           onClick={handleEnterManually}
+          // disabled={!!error}
         >
           Enter code manually
         </Button>
@@ -54,9 +77,53 @@ export const OTPNotification = () => {
 export const OTPInput = () => {
   const navigate = useNavigate();
   const [otp, setOtp] = useState(['', '', '', '']);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
+  const auth = useAuth();
+  
+  // RTK Query hooks
+  const [confirmOTP, { 
+    isLoading: isConfirming,
+    isError: isConfirmError,
+    error: confirmErrorData
+  }] = useConfirmOTPReqMutation();
+  
+  const [resendOTP, { 
+    isLoading: isResending,
+    isSuccess: isResendSuccess,
+    isError: isResendError,
+    error: resendErrorData
+  }] = useResendOTPReqMutation();
+  
+  // Check auth on mount
+  // useEffect(() => {
+  //   if (!auth.mobile && !auth.email) {
+  //     setError('Authentication information missing. Please log in again.');
+  //   }
+  // }, [auth]);
+  
+  // Handle resend success/error
+  useEffect(() => {
+    if (isResendSuccess) {
+      setSuccessMessage('OTP has been resent successfully');
+      // Clear success message after 3 seconds
+      const timer = setTimeout(() => setSuccessMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+    
+    if (isResendError && resendErrorData) {
+      setError(resendErrorData?.data?.message || 'Failed to resend OTP. Please try again.');
+      // Clear error after 3 seconds
+      const timer = setTimeout(() => setError(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isResendSuccess, isResendError, resendErrorData]);
   
   const handleChange = (index, value) => {
+    // Clear any existing error when user starts typing
+    if (error) setError('');
+    
     // Only allow numbers
     if (!/^[0-9]*$/.test(value)) return;
     
@@ -82,7 +149,10 @@ export const OTPInput = () => {
     const pastedData = e.clipboardData.getData('text').slice(0, 4).split('');
     
     // Only proceed if pasted content is all numbers
-    if (pastedData.some(char => !/^[0-9]$/.test(char))) return;
+    if (pastedData.some(char => !/^[0-9]$/.test(char))) {
+      setError('OTP must contain only numbers');
+      return;
+    }
     
     const newOtp = [...otp];
     pastedData.forEach((value, index) => {
@@ -96,22 +166,54 @@ export const OTPInput = () => {
     inputRefs[lastFilledIndex].current.focus();
   };
   
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const otpString = otp.join('');
-    if (otpString.length === 4) {
-      // Here you would normally verify the OTP with your backend
-      // For now, we'll just navigate to the success page
+    
+    if (otpString.length !== 4) {
+      setError('Please enter a valid 4-digit OTP');
+      return;
+    }
+    
+    try {
+      await confirmOTP({
+        body: {
+          "requestName": "ConfirmOTPReq",
+          "inputParamters": {
+            "OTPInformation": {
+              "OTPNo": otpString,
+              "email": auth.email,
+              "mobile": auth.mobile
+            }
+          }
+        }
+      }).unwrap();
+      
+      // If we get here, verification was successful
       navigate('/verify/success');
+    } catch (err) {
+      setError(err.data?.message || 'Invalid OTP. Please try again.');
     }
   };
   
-  const handleResend = () => {
-    // Here you would trigger OTP resend
-    alert('OTP resent successfully!');
+  const handleResend = async () => {
+    try {
+      await resendOTP({
+        body: {
+          "requestName": "ResendOTP",
+          "inputParamters": {
+            "email": auth.email,
+            "mobile": auth.mobile
+          }
+        }
+      }).unwrap();
+      // Success is handled in the useEffect
+    } catch (err) {
+      // Error is handled in the useEffect
+    }
   };
   
   const handleBackToLogin = () => {
-    navigate('/login');
+    navigate('/auth');
   };
   
   // Check if OTP is complete
@@ -127,9 +229,25 @@ export const OTPInput = () => {
         
         {/* Title and Description */}
         <h1 className="text-2xl font-semibold text-center mb-2">Check your phone</h1>
-        <p className="text-gray-600 text-center mb-8">
-          Please enter the otp.
+        <p className="text-gray-600 text-center mb-4">
+          Please enter the OTP sent to {auth.mobile || 'your phone'}.
         </p>
+        
+        {/* Error Message */}
+        {error && (
+          <div className="w-full p-3 mb-4 flex items-center bg-red-50 text-red-700 rounded">
+            <AlertCircle className="h-5 w-5 mr-2" />
+            <span>{error}</span>
+          </div>
+        )}
+        
+        {/* Success Message */}
+        {successMessage && (
+          <div className="w-full p-3 mb-4 flex items-center bg-green-50 text-green-700 rounded">
+            <CheckCircle className="h-5 w-5 mr-2" />
+            <span>{successMessage}</span>
+          </div>
+        )}
         
         {/* OTP Input Fields */}
         <div className="flex justify-center space-x-3 mb-6">
@@ -145,6 +263,7 @@ export const OTPInput = () => {
               onPaste={index === 0 ? handlePaste : undefined}
               ref={inputRefs[index]}
               autoFocus={index === 0}
+              disabled={isConfirming}
             />
           ))}
         </div>
@@ -152,24 +271,25 @@ export const OTPInput = () => {
         {/* Verify Button */}
         <Button 
           className={`w-full py-6 ${
-            isOtpComplete 
+            isOtpComplete && !isConfirming
               ? 'bg-[#0288D1] hover:bg-[#0277BD] font-semibold text-white' 
               : 'bg-[#E0E0E0] text-gray-500 cursor-not-allowed'
           }`}
           onClick={handleVerify}
-          disabled={!isOtpComplete}
+          disabled={!isOtpComplete || isConfirming}
         >
-          Verify email
+          {isConfirming ? "Verifying..." : "Verify OTP"}
         </Button>
         
         {/* Resend Link */}
         <p className="mt-4 text-sm text-gray-600">
-          Didn't receive the email? 
+          Didn't receive the OTP? 
           <button 
             className="ml-1 text-[#0288D1] font-semibold hover:underline"
             onClick={handleResend}
+            disabled={isResending}
           >
-            Click to resend
+            {isResending ? "Resending..." : "Click to resend"}
           </button>
         </p>
         
@@ -191,16 +311,7 @@ export const VerificationSuccess = () => {
   const navigate = useNavigate();
   
   const handleContinue = () => {
-    navigate('/dash'); // Navigate to dashboard or next step
-  };
-  
-  const handleResend = () => {
-    // Here you would trigger email resend
-    alert('Email resent successfully!');
-  };
-  
-  const handleBackToLogin = () => {
-    navigate('/login');
+    navigate('/dashboard');
   };
   
   return (
@@ -214,7 +325,7 @@ export const VerificationSuccess = () => {
         {/* Title and Description */}
         <h1 className="text-2xl font-semibold text-center mb-2">Phone number verified</h1>
         <p className="text-gray-600 text-center mb-8">
-          Phone number successfully verified.
+          Your phone number has been successfully verified. You can now access your account.
         </p>
         
         {/* Continue Button */}
@@ -222,51 +333,23 @@ export const VerificationSuccess = () => {
           className="w-full bg-[#0288D1] hover:bg-[#0277BD] font-semibold text-white py-6"
           onClick={handleContinue}
         >
-          Continue
+          Continue to Dashboard
         </Button>
-        
-        {/* Resend Link */}
-        <p className="mt-4 text-sm text-gray-600">
-          Didn't receive the email? 
-          <button 
-            className="ml-1 text-[#0288D1] font-semibold hover:underline"
-            onClick={handleResend}
-          >
-            Click to resend
-          </button>
-        </p>
-        
-        {/* Back to Login */}
-        <button 
-          className="mt-6 flex items-center text-gray-600 hover:text-gray-800"
-          onClick={handleBackToLogin}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to log in
-        </button>
       </div>
     </div>
   );
 };
 
-// Main component that ties all screens together
+// Main component that ties all screens together using React Router
+// Note: This component isn't directly used since routing is handled in App.js/Router config
 const OTPVerificationFlow = () => {
-  const [step, setStep] = useState('notification'); // notification, input, success
-  
-  const renderStep = () => {
-    switch (step) {
-      case 'notification':
-        return <OTPNotification onNext={() => setStep('input')} />;
-      case 'input':
-        return <OTPInput onVerify={() => setStep('success')} />;
-      case 'success':
-        return <VerificationSuccess />;
-      default:
-        return <OTPNotification onNext={() => setStep('input')} />;
-    }
-  };
-  
-  return renderStep();
+  // This component should be used for reference only as routing is handled externally
+  return (
+    <div>
+      {/* This content would be rendered by React Router based on URL */}
+      {/* See implementation details in route config */}
+    </div>
+  );
 };
 
 export default OTPVerificationFlow;

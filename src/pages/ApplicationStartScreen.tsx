@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { X, Plus, ArrowRight, HelpCircle, PlusCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Plus, ArrowRight, HelpCircle, PlusCircle, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import ApplicationHeader from '@/components/ApplicationHeader';
 import ApplicationLayout from '@/components/ApplicationLayout';
-import { retry } from '@reduxjs/toolkit/query';
 import LoadingScreenExact from './LoadingScreen';
 import { useNavigate } from 'react-router-dom';
+import { useCreateUserProfileReqMutation } from '@/service/debtorAccountService';
+import useAuth from '@/hooks/useAuth';
 
 const ApplicationStartScreen = () => {
+  const navigate = useNavigate();
+  const auth = useAuth();
+  
+  // Form states
   const [applicationType, setApplicationType] = useState('individual');
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     idNumber: '',
     name: '',
@@ -24,39 +25,139 @@ const ApplicationStartScreen = () => {
     credit: false,
     notBlacklisted: false
   });
-
-  const handleConsent = (field) => {
-    setConsents(prev => ({ ...prev, [field]: !prev[field] }));
-  };
-
+  
+  // Validation states
+  const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState('');
+  
+  // API hook
+  const [createUserProfile, { 
+    isLoading, 
+    isSuccess, 
+    isError, 
+    error: apiErrorData 
+  }] = useCreateUserProfileReqMutation();
+  
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleNext = () => {
-    // Handle form submission or navigation to next step
-    console.log('Form Data:', formData);
-    console.log('Consents:', consents);
-    setIsLoading(true)
-  };
-
-  useEffect(() => {
-    if(isLoading){
-      setTimeout(() => {
-        navigate('/application')
-      }, 2000);
+    
+    // Clear field-specific error when user types
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
-  }, [isLoading])
+    
+    // Clear API error when user makes any change
+    if (apiError) {
+      setApiError('');
+    }
+  };
   
-
-  if(isLoading){
-    return <LoadingScreenExact />
+  // Handle consent checkboxes
+  const handleConsent = (field) => {
+    setConsents(prev => ({ ...prev, [field]: !prev[field] }));
+    
+    // Clear API error when user makes any change
+    if (apiError) {
+      setApiError('');
+    }
+  };
+  
+  // Form validation
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // ID Number validation
+    if (!formData.idNumber) {
+      newErrors.idNumber = 'ID number is required';
+    } else if (!/^\d{13}$/.test(formData.idNumber)) {
+      newErrors.idNumber = 'ID number must be 13 digits';
+    }
+    
+    // Name validation
+    if (!formData.name) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+    
+    // Surname validation
+    if (!formData.surname) {
+      newErrors.surname = 'Surname is required';
+    } else if (formData.surname.length < 2) {
+      newErrors.surname = 'Surname must be at least 2 characters';
+    }
+    
+    // Consent validation
+    if (!consents.academic || !consents.credit || !consents.notBlacklisted) {
+      newErrors.consents = 'All consents are required to proceed';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  
+  // Handle form submission
+  const handleNext = async () => {
+    // First validate the form
+    if (!validateForm()) {
+      return;
+    }
+    
+    try {
+      // Call the API
+      await createUserProfile({
+        body: {
+          "entityName": "DebtorAccount",
+          "requestName": "CreateUserProfile",
+          "inputParamters": {
+            "Profile": {
+              "ExternalLogonId": auth.user?.externalLogonId,
+              "UserType": applicationType === 'individual' ? "Individual" : "Business",
+              "RsaId": formData.idNumber,
+              "Name": formData.name,
+              "Surname": formData.surname
+            }
+          }
+        }
+      }).unwrap();
+      
+      // Success handled in useEffect
+    } catch (err) {
+      // Error handled in useEffect
+    }
+  };
+  
+  // Handle API response
+  useEffect(() => {
+    // Handle error
+    if (isError && apiErrorData) {
+      setApiError(apiErrorData.data?.message || 'Failed to create profile. Please try again.');
+    }
+    
+    // Handle success
+    if (isSuccess) {
+      navigate('/dashboard');
+    }
+  }, [isSuccess, isError, apiErrorData, navigate]);
+  
+  // Check if all required fields and consents are filled/checked
+  const isFormValid = 
+    formData.idNumber && 
+    formData.name && 
+    formData.surname && 
+    consents.academic && 
+    consents.credit && 
+    consents.notBlacklisted;
+  
+  // Show loading screen when API call is in progress
+  if (isLoading) {
+    return <LoadingScreenExact />;
   }
 
   return (
-   <ApplicationLayout>
-
+    <ApplicationLayout>
       {/* Main Content */}
       <main className="flex-grow flex flex-col pt-4 pb-24 px-4 md:px-8">
         {/* Application Container */}
@@ -65,13 +166,17 @@ const ApplicationStartScreen = () => {
           <div className="bg-white rounded-lg p-4 md:p-6 mb-4 shadow-sm">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 md:mb-8">
               <h1 className="text-xl md:text-2xl font-bold text-gray-800">Get started with your application</h1>
-              <Button variant="outline" className="text-[#58B6E9] border-[#58B6E9] hover:bg-blue-50 w-full md:w-auto">
+              <Button 
+                variant="outline" 
+                className="text-[#58B6E9] border-[#58B6E9] hover:bg-blue-50 w-full md:w-auto"
+                onClick={() => navigate('/dashboard')}
+              >
                 Save & Exit
               </Button>
             </div>
             
             {/* Collapsible Information Panel */}
-            <div className=" bg-gray-100 rounded-lg p-4 flex justify-between items-center">
+            <div className="bg-gray-100 rounded-lg p-4 flex justify-between items-center">
               <h2 className="text-sm md:text-base text-gray-700">Important Information About Our Integrated Verification Process</h2>
               <button className="text-gray-400 flex-shrink-0">
                 <PlusCircle className="h-5 w-5" />
@@ -79,14 +184,23 @@ const ApplicationStartScreen = () => {
             </div>
           </div>
 
+          {/* API Error Message */}
+          {apiError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 flex items-start">
+              <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+              <span>{apiError}</span>
+            </div>
+          )}
+
           {/* Form Section */}
-          <div className="bg-white rounded-lg p-4 md:p-6 mb-4 shadow-sm  ">
+          <div className="bg-white rounded-lg p-4 md:p-6 mb-4 shadow-sm">
             {/* Application Type Toggle */}
             <div className="flex mb-6 max-w-2xl">
               <button
-                className={`flex-1 py-2 px-4 text-center border ${
+                type="button"
+                className={`flex-1 py-2 px-4 text-center border-2 ${
                   applicationType === 'individual' 
-                    ? 'bg-white border-gray-300 text-gray-800 font-medium' 
+                    ? 'bg-white border-blue-300 text-gray-800 font-medium' 
                     : 'bg-gray-50 border-gray-200 text-gray-500'
                 } rounded-l-md transition-colors`}
                 onClick={() => setApplicationType('individual')}
@@ -94,9 +208,10 @@ const ApplicationStartScreen = () => {
                 Individual
               </button>
               <button
-                className={`flex-1 py-2 px-4 text-center border ${
+                type="button"
+                className={`flex-1 py-2 px-4 text-center border-2 ${
                   applicationType === 'business' 
-                    ? 'bg-white border-gray-300 text-gray-800 font-medium' 
+                    ? 'bg-white border-blue-300 text-gray-800 font-medium' 
                     : 'bg-gray-50 border-gray-200 text-gray-500'
                 } rounded-r-md transition-colors`}
                 onClick={() => setApplicationType('business')}
@@ -114,19 +229,21 @@ const ApplicationStartScreen = () => {
                     ID Number
                   </label>
                   <span className="text-red-500 ml-1">*</span>
-                  <button className="ml-2 text-gray-400">
+                  <button type="button" className="ml-2 text-gray-400">
                     <HelpCircle className="h-4 w-4" />
                   </button>
                 </div>
-                <Select>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={formData.idNumber || "Select ID Number"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="9902020304089">9902020304089</SelectItem>
-                    <SelectItem value="8801015123456">8801015123456</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="idNumber"
+                  name="idNumber"
+                  value={formData.idNumber}
+                  onChange={handleChange}
+                  className={`w-full ${errors.idNumber ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="Enter your ID number"
+                />
+                {errors.idNumber && (
+                  <p className="mt-1 text-sm text-red-600">{errors.idNumber}</p>
+                )}
               </div>
               
               {/* Name Field */}
@@ -142,9 +259,12 @@ const ApplicationStartScreen = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full border-gray-300"
+                  className={`w-full ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                   placeholder="Enter your name"
                 />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                )}
               </div>
               
               {/* Surname Field */}
@@ -160,9 +280,12 @@ const ApplicationStartScreen = () => {
                   name="surname"
                   value={formData.surname}
                   onChange={handleChange}
-                  className="w-full border-gray-300"
+                  className={`w-full ${errors.surname ? 'border-red-500' : 'border-gray-300'}`}
                   placeholder="Enter your surname"
                 />
+                {errors.surname && (
+                  <p className="mt-1 text-sm text-red-600">{errors.surname}</p>
+                )}
               </div>
 
               {/* Consent Checkboxes */}
@@ -202,6 +325,10 @@ const ApplicationStartScreen = () => {
                     I'm not blacklisted or sequestrated or under debt review
                   </label>
                 </div>
+                
+                {errors.consents && (
+                  <p className="mt-1 text-sm text-red-600">{errors.consents}</p>
+                )}
               </div>
             </div>
           </div>
@@ -210,28 +337,24 @@ const ApplicationStartScreen = () => {
           <div className="bg-white rounded-lg p-4 md:p-6 mb-2 shadow-sm">
             <div className="flex justify-start">
               <Button 
+                type="button"
                 onClick={handleNext}
                 className={`flex items-center text-white w-40 px-4 md:px-6 py-3 md:py-5 ${
-                  formData.name && formData.surname && consents.academic && consents.credit && consents.notBlacklisted
+                  isFormValid
                     ? 'bg-[#58B6E9] hover:bg-blue-400' 
-                    : 'bg-gray-200 text-gray-500'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 } transition-colors`}
-                disabled={!(formData.name && formData.surname && consents.academic && consents.credit && consents.notBlacklisted)}
+                disabled={!isFormValid || isLoading}
               >
-                Next
+                {isLoading ? "Processing..." : "Next"}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
           </div>
         </div>
       </main>
-
-      {/* Footer - Now positioned at the bottom of the page */}
-      </ApplicationLayout>
+    </ApplicationLayout>
   );
 };
 
-
-
-export { ApplicationStartScreen };
 export default ApplicationStartScreen;

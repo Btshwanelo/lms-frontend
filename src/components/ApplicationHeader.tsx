@@ -10,7 +10,7 @@ const ApplicationHeader = () => {
         const handleSave = () => {
           // Handle save logic here
           console.log('Application saved!');
-          navigate('/saved-applications')
+          navigate('/dashboard')
           setIsModalOpen(false);
         };
   return (
