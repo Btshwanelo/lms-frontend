@@ -60,7 +60,7 @@ const LandingPage = () => {
             <p className="text-lg text-[#475467]  font-normal mb-8">
               Leading Financial Solutions Tailored for<br/> Healthcare Professionals.
             </p>
-            <Button className="bg-blue-500 w-full hover:bg-blue-600 text-white px-8 py-6 text-base rounded-md" onClick={()=>navigate('create-profile')}>
+            <Button className="bg-blue-500 w-full hover:bg-blue-600 text-white px-8 py-6 text-base rounded-md" onClick={()=>navigate('/auth')}>
               Get Started
             </Button>
           </div>
