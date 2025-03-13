@@ -39,10 +39,6 @@ const CreateProfilePage = React.lazy(() => import('./pages/CreateProfilePage'));
 // const LoanDetails = React.lazy(() => import('./pages/loans/LoanDetails'));
 // const LoansList = React.lazy(() => import('./pages/loans/LoansList'));
 // const Profile = React.lazy(() => import('./pages/user/Profile'));
-// const Settings = React.lazy(() => import('./pages/user/Settings'));
-// const NotFound = React.lazy(() => import('./pages/NotFound'));
-
-
 
 function App() {
   return (
