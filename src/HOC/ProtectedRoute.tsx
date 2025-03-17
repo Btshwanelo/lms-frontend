@@ -1,6 +1,6 @@
-import { setRedirectPath } from '@/slices/authSlice';
+import { clearAuthData, setRedirectPath, updateTokens } from '@/slices/authSlice';
 import { RootState } from '@/store';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
@@ -16,111 +16,99 @@ interface DecodedToken {
 }
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const authDetails = useSelector((state: RootState) => state.auth);
-  const { inProgressStep, isProfileComplete, isCreateProfile } = useSelector((state: RootState) => state.details);
+  const { accessToken, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const location = useLocation();
-  const [isTokenValid, setIsTokenValid] = useState(true);
 
-  useEffect(() => {
-    const validateToken = () => {
-      if (!authDetails.accessToken) {
-        setIsTokenValid(false);
-        return;
-      }
+  console.log('ProtectedRoute mounted', { 
+    path: location.pathname,
+    isAuthenticated,
+    hasAccessToken: !!accessToken 
+  });
 
-      try {
-        const decodedToken = jwtDecode<DecodedToken>(authDetails.accessToken);
-        const currentTime = Math.floor(Date.now() / 1000);
+  // Helper function to handle logout and redirect
+  const handleLogout = () => {
+    console.log('Logging out user and redirecting', { 
+      fromPath: location.pathname 
+    });
+    dispatch(setRedirectPath(location.pathname));
+    dispatch(clearAuthData());
+  };
 
-        // Check if token is expired or not yet valid
-        if (decodedToken.exp < currentTime || decodedToken.nbf > currentTime) {
-          setIsTokenValid(false);
-          return;
-        }
-
-        // Check if token is about to expire (e.g., in next 5 minutes)
-        const expirationBuffer = 5 * 60; // 5 minutes in seconds
-        if (decodedToken.exp - currentTime < expirationBuffer) {
-          handleTokenRefresh();
-        }
-
-        setIsTokenValid(true);
-      } catch (error) {
-        console.error('Token validation error:', error);
-        setIsTokenValid(false);
-      }
-    };
-
-    validateToken();
-
-    // Set up interval to check token validity
-    const intervalId = setInterval(validateToken, 60000); // Check every minute
-
-    return () => clearInterval(intervalId);
-  }, [authDetails.accessToken]);
-
-  const handleTokenRefresh = async () => {
-    if (!authDetails.refreshToken) {
-      setIsTokenValid(false);
-      return;
+  // Function to validate the token
+  const validateToken = () => {
+    if (!accessToken) {
+      console.log('Token validation failed: No access token');
+      return false;
     }
 
     try {
-      const response = await fetch('https://login.ezra360.com/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          refresh_token: authDetails.refreshToken,
-          client_id: 'xrm-password-auth',
-          grant_type: 'refresh_token',
-        }),
-      });
+      const decodedToken = jwtDecode<DecodedToken>(accessToken);
+      const currentTime = Math.floor(Date.now() / 1000);
 
-      if (!response.ok) {
-        throw new Error('Token refresh failed');
-      }
-
-      const data = await response.json();
-      // Update your Redux store with the new tokens
-      // You'll need to create an action for this
-      dispatch({
-        type: 'auth/updateTokens',
-        payload: {
-          accessToken: data.access_token,
-          refreshToken: data.refresh_token,
-        },
-      });
+      console.log('decodedToken',decodedToken)
+      console.log('currentTime',currentTime)
+      
+      // Check if token is expired or not yet valid
+      const isExpired = decodedToken.exp < currentTime;
+      // const isNotYetValid = decodedToken.nbf > currentTime;
+      const isNotYetValid = false;
+      
+      // if (isExpired) {
+      //   console.log('Token validation failed: Token expired', { 
+      //     expiry: new Date(decodedToken.exp * 1000).toISOString(), 
+      //     now: new Date(currentTime * 1000).toISOString() 
+      //   });
+      // }
+      
+      // if (isNotYetValid) {
+      //   console.log('Token validation failed: Token not yet valid', { 
+      //     validFrom: new Date(decodedToken.nbf * 1000).toISOString(), 
+      //     now: new Date(currentTime * 1000).toISOString() 
+      //   });
+      // }
+      
+      const isValid = !(isExpired || isNotYetValid);
+      return isValid;
     } catch (error) {
-      console.error('Token refresh error:', error);
-      setIsTokenValid(false);
+      console.error('Token validation error:', error);
+      return false;
     }
   };
 
-  // Handle invalid token
-  if (!isTokenValid) {
-    dispatch(setRedirectPath(location.pathname));
-    return <Navigate to="/login" replace />;
-  }
+  // Check token validity immediately on component render
+  const isTokenValid = validateToken();
 
-  // Handle other authentication checks
-  if (!authDetails.isAuthenticated) {
-    dispatch(setRedirectPath(location.pathname));
-    return <Navigate to="/login" replace />;
-  }
-
-  if (isCreateProfile) {
-    if (location.pathname !== '/profile/create') {
-      return <Navigate to="/profile/create" />;
+  useEffect(() => {
+    // If token is invalid but user is still marked as authenticated, log them out
+    if (!isTokenValid && isAuthenticated) {
+      handleLogout();
     }
-  }
 
-  if (inProgressStep?.step !== 0 && isProfileComplete === false) {
-    if (location.pathname !== '/onboarding') {
-      return <Navigate to="/onboarding" />;
-    }
+    // Set up interval to check token validity
+    const intervalId = setInterval(() => {
+      if (!validateToken() && isAuthenticated) {
+        handleLogout();
+      }
+    }, 5000); // Check every minute
+
+    return () => clearInterval(intervalId);
+  }, [accessToken, isAuthenticated]);
+
+  // Handle redirects - this will run on every render including page refresh
+  if (!isAuthenticated || !accessToken || !isTokenValid) {
+    // Save the current path for redirection after login
+    console.log('Redirecting to auth page', { 
+      reason: !isAuthenticated ? 'Not authenticated' : 
+             !accessToken ? 'No access token' : 
+             'Invalid token',
+      fromPath: location.pathname
+    });
+    
+    dispatch(setRedirectPath(location.pathname));
+    
+    // Force redirect to auth page
+    return <Navigate to="/auth" replace />;
   }
 
   return children;

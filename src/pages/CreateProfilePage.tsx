@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle } from 'lucide-react';
 import { useAuthenticateUserMutation } from '@/service/genericServices';
 import { useCreateExternalLogonMutation } from '@/service/externalLogonService';
+import { useDispatch } from 'react-redux';
+import { setAuthData } from '@/slices/authSlice';
 
 const CreateProfilePage = () => {
   const [activeTab, setActiveTab] = useState('signup');
@@ -16,6 +18,8 @@ const CreateProfilePage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+
+  const dispatch = useDispatch()
   
   // Form errors
   const [errors, setErrors] = useState({});
@@ -70,10 +74,9 @@ const CreateProfilePage = () => {
         .unwrap()
         .then((response) => {
           // Store token in localStorage
-          if (response && response.token) {
-            localStorage.setItem('token', response.token);
+            dispatch(setAuthData(response))
             navigate('/dashboard');
-          }
+          
         })
         .catch((error) => {
           setErrors({ 

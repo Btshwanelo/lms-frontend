@@ -8,8 +8,7 @@ export function Header() {
         <div className="flex gap-10 items-center">
           <div>
             <img
-              image="https://cdn.builder.io/api/v1/image/assets/TEMP/c553d01dba5312a825f6f3a6160918da98b5d1dd"
-              altText="Logo"
+              image="/images/logo.png"
               alt="Logo"
             />
           </div>
